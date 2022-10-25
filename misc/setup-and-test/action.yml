@@ -1,0 +1,16 @@
+name: Setup environment and Run test
+description: Setup environment and Run test
+
+runs:
+  using: composite
+  steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+      with:
+        clean: true
+
+    - name: Setup
+      uses: pukenicorn/gh-workflows/mux/setup@main
+
+    - name: Test
+      uses: pukenicorn/gh-workflows/mux/test@main

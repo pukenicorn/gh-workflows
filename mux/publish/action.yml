@@ -1,0 +1,62 @@
+name: Publish
+description: Publish
+
+inputs:
+  base-path:
+    description: Base path to run install on
+    required: false
+    default: .
+  name:
+    description: Name of exported package
+    required: false
+    default: ${{ github.repository }}
+  registry:
+    description: URL of registry to export to
+    required: false
+  registry-token:
+    description: Token for logging into registry to export to
+    required: true
+  version:
+    description: Version of package
+    required: true
+
+
+runs:
+  using: composite
+  steps:
+    - name: Normalize `version`
+      id: normalize-version
+      shell: bash
+      run: echo normalized-version=$(echo ${{ inputs.version }} | grep -Eo '[0-9.]+') >> $GITHUB_OUTPUT
+
+    - name: Publish node
+      uses: pukenicorn/gh-workflows/node/publish@main
+      with:
+        base-path: ${{ inputs.base-path }}
+        name: ${{ inputs.name }}
+        registry-token: ${{ inputs.registry-token }}
+        version: ${{ steps.normalize-version.outputs.normalized-version }}
+      env:
+        # exported from node/setup
+        NPM_CONFIG_USERCONFIG: /home/runner/work/_temp/.npmrc
+      if: env.BUILD_LANG == 'node'
+
+    - name: Publish python
+      uses: pukenicorn/gh-workflows/python/publish@main
+      with:
+        base-path: ${{ inputs.base-path }}
+        name: ${{ inputs.name }}
+        registry: ${{ inputs.registry != '' && inputs.registry || 'NOT IMPLEMENTED' }}
+        registry-token: ${{ inputs.registry-token }}
+        version: ${{ steps.normalize-version.outputs.normalized-version }}
+      if: env.BUILD_LANG == 'python'
+
+    - name: Publish dotnet
+      uses: pukenicorn/gh-workflows/dotnet/publish@main
+      with:
+        base-path: ${{ inputs.base-path }}
+        name: ${{ inputs.name }}
+        registry: ${{ inputs.registry != '' && inputs.registry || 'https://api.nuget.org/v3/index.json' }}
+        registry-token: ${{ inputs.registry-token }}
+        version: ${{ steps.normalize-version.outputs.normalized-version }}
+      if: env.BUILD_LANG == 'dotnet'

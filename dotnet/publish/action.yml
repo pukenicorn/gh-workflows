@@ -1,0 +1,44 @@
+name: Publish dotnet package
+description: Publish dotnet package
+
+inputs:
+  base-path:
+    description: Base path to run install on
+    required: false
+    default: .
+  name:
+    description: Name of exported package
+    required: false
+    default: ${{ github.repository }}
+  registry:
+    description: URL of registry to export to
+    required: false
+    default: https://api.nuget.org/v3/index.json
+  registry-token:
+    description: Token for logging into registry to export to
+    required: true
+  version:
+    description: Version of package
+    required: true
+
+
+runs:
+  using: composite
+  steps:
+    - name: Add source for push
+      working-directory: ${{ inputs.base-path }}
+      shell: bash
+      run: |
+        dotnet add source --name xoxo "${{ inputs.registry }}" --username USERNAME --store-password-in-clear-text --password ${{ inputs.registry-token }}
+
+    - name: Build nuget package
+      working-directory: ${{ inputs.base-path }}
+      shell: bash
+      run: |
+        dotnet pack "${{ inputs.name }}.csproj" --configuration Release -p:PackageVersion=${{ inputs.registry-token }}
+
+    - name: Push package to registry
+      working-directory: ${{ inputs.base-path }}
+      shell: bash
+      run: |
+        dotnet nuget push "bin/Release/${{ inputs.name }}.${{ inputs.version }}.nupkg" --api-key ${{ inputs.registry-token }} --source "xoxo"

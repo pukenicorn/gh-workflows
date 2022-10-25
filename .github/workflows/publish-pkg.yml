@@ -1,0 +1,93 @@
+name: Checkout and publish package
+
+on:
+  workflow_call:
+    inputs:
+      base-language:
+        description: Base language (language of codebase)
+        type: string
+        required: true
+      base-language-cache:
+        description: Base language dependency manager to cache (`none`, [...package manager name...])
+        type: string
+        required: false
+      package-language:
+        description: Package Language (language of package to be export) (Defaults to base language)
+        type: string
+        required: false
+      package-language-cache:
+        description: Base language dependency manager to cache (`default`, [...package manager name...])
+        type: string
+        required: false
+      package-path:
+        description: Base path of package to be build
+        type: string
+        required: false
+        default: .
+      post-setup-command:
+        description: Command to run after setup base environment (but before package env, will be append to cli of respective language)
+        type: string
+        required: false
+      package-name:
+        description: Name of exported package
+        type: string
+        required: false
+        default: ${{ github.repository }}
+      package-registry:
+        description: URL of registry to export to
+        type: string
+        required: false
+      package-version:
+        description: Version of package
+        type: string
+        required: true
+    secrets:
+      PACKAGE_REGISTRY_TOKEN:
+        description: Token for logging into registry to export to
+        required: false
+
+env:
+  BUILD_LANG: ${{ inputs.base-language }}
+
+
+jobs:
+  publish:
+    name: Publish package
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Setup for base
+        uses: pukenicorn/gh-workflows/mux/setup@main
+        with:
+          cache: ${{ inputs.base-language-cache }}
+
+      - name: Run post-setup command
+        uses: pukenicorn/gh-workflows/mux/run-command@main
+        with:
+          command: ${{ inputs.post-setup-command }}
+        env:
+          PACKAGE_NAME: ${{ inputs.package-name }}
+          PACKAGE_REPOSITORY: ${{ inputs.package-registry }}
+        if: inputs.post-setup-command != ''
+
+      - name: Setup for package
+        uses: pukenicorn/gh-workflows/mux/setup@main
+        env:
+          BUILD_LANG: ${{ inputs.package-language != '' && inputs.package-language || inputs.base-language }}
+        with:
+          cache: ${{ inputs.package-language-cache }}
+          registry: ${{ inputs.package-registry }}
+        if: inputs.package-language != '' && inputs.package-language != inputs.base-language
+
+      - name: Publish package
+        uses: pukenicorn/gh-workflows/mux/publish@main
+        env:
+          BUILD_LANG: ${{ inputs.package-language != '' && inputs.package-language || inputs.base-language }}
+        with:
+          base-path: ${{ inputs.package-path }}
+          name: ${{ inputs.package-name }}
+          version: ${{ inputs.package-version }}
+          registry: ${{ inputs.package-registry }}
+          registry-token: ${{ secrets.PACKAGE_REGISTRY_TOKEN != '' && secrets.PACKAGE_REGISTRY_TOKEN || github.token }}

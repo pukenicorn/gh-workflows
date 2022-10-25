@@ -1,0 +1,68 @@
+name: Publish node package
+description: Publish node package
+
+inputs:
+  base-path:
+    description: Base path to run install on
+    required: false
+    default: .
+  name:
+    description: Name of exported package
+    required: false
+    default: ${{ github.repository }}
+#  registry:
+#    description: URL of registry to export to
+#    required: false
+#    default: registry.npmjs.org
+  registry-token:
+    description: Token for logging into registry to export to
+    required: true
+  version:
+    description: Version of package
+    required: true
+
+
+runs:
+  using: composite
+  steps:
+#     Copy npmrc to working dir, because yarn won't pickup config from default path
+    - name: Copy .npmrc to working dir
+      working-directory: ${{ inputs.base-path }}
+      shell: bash
+      run: cp /home/runner/work/_temp/.npmrc .npmrc
+
+    - name: Add .npmignore to only include required files
+      working-directory: ${{ inputs.base-path }}
+      shell: bash
+      run: |
+        echo '
+          !dist
+          !example
+          !lib
+          !*.js
+          !*.d.ts
+          !package.json
+          !README.md
+          !LICENSE
+          !.es*
+          /*
+          /**/*
+          node_modules
+        ' | sed 's/ //g' > .npmignore
+
+    - name: Install dependencies
+      working-directory: ${{ inputs.base-path }}
+      shell: bash
+      run: yarn
+
+    - name: Build Assets
+      working-directory: ${{ inputs.base-path }}
+      shell: bash
+      run: yarn build
+
+    - name: Publish
+      working-directory: ${{ inputs.base-path }}
+      shell: bash
+      run: yarn publish --new-version ${{ inputs.version }} --no-git-tag-version --no-commit-hooks --verbose
+      env:
+        NODE_AUTH_TOKEN: ${{ inputs.registry-token }}

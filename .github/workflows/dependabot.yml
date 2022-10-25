@@ -1,0 +1,26 @@
+name: Auto merge Dependabot
+
+on:
+  workflow_call:
+    inputs:
+      pr-number:
+        description: Github PR# (required if is manually triggered)
+        type: number
+        required: false
+
+
+jobs:
+  dependabot:
+    name: Check if pr is by dependabot
+    runs-on: ubuntu-latest
+    steps:
+      - name: Automatically Merge Dependabot
+        uses: fastify/github-action-merge-dependabot@v3.4.0
+        if: github.event_name == 'pull_request'
+        with:
+          target: minor
+      - name: Manually Merge Dependabot
+        uses: fastify/github-action-merge-dependabot@v3.4.0
+        if: github.event_name == 'workflow_dispatch'
+        with:
+          pr-number: ${{ inputs.pr-number }}

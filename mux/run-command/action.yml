@@ -1,0 +1,33 @@
+name: Run command
+description: Run command per `env.BUILD_LANG`
+
+inputs:
+  command:
+    description: Command to run
+    required: true
+  base-path:
+    description: Base path to run command on
+    required: false
+    default: .
+
+
+runs:
+  using: composite
+  steps:
+    - name: Run command for node
+      shell: bash
+      working-directory: ${{ inputs.base-path }}
+      run: yarn run '${{ inputs.command }}'
+      if: env.BUILD_LANG == 'node'
+
+    - name: Run command for python
+      shell: bash
+      working-directory: ${{ inputs.base-path }}
+      run: poetry run task '${{ inputs.command }}'
+      if: env.BUILD_LANG == 'python'
+
+    - name: Run command for dotnet
+      shell: bash
+      working-directory: ${{ inputs.base-path }}
+      run: dotnet '${{ inputs.command }}'
+      if: env.BUILD_LANG == 'dotnet'

@@ -1,0 +1,20 @@
+name: Setup environment
+description: Setup environment per `env.BUILD_LANG`
+
+inputs:
+  language:
+    description: Language
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - name: Yarn test
+      shell: bash
+      run: yarn test
+      if: env.BUILD_LANG == 'node'
+
+    - name: Poetry run pytest
+      shell: bash
+      run: poetry run pytest
+      if: env.BUILD_LANG == 'python'
