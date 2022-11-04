@@ -7,6 +7,14 @@ on:
         description: Language
         type: string
         required: true
+      registry:
+        description: URL of registry
+        type: string
+        required: false
+    secrets:
+      REGISTRY_TOKEN:
+        description: Token for logging into registry to export to
+        required: false
 
 env:
   BUILD_LANG: ${{ inputs.language }}
@@ -22,6 +30,9 @@ jobs:
 
       - name: Setup workspace
         uses: pukenicorn/gh-workflows/mux/setup@main
+        with:
+          registry: ${{ inputs.registry }}
+          registry-token: ${{ secrets.PACKAGE_REGISTRY_TOKEN != '' && secrets.PACKAGE_REGISTRY_TOKEN || github.token }}
 
       - name: Test
         uses: pukenicorn/gh-workflows/mux/test@main

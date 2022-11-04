@@ -13,6 +13,10 @@ inputs:
   registry:
     description: Registry
     required: false
+  registry-token:
+    description: Token for logging into registry
+    required: false
+    default: XXXXX-XXXXX-XXXXX-XXXXX
 
 
 runs:
@@ -26,7 +30,22 @@ runs:
         cache: ${{ inputs.cache != 'none' && inputs.cache || '' }}
         always-auth: true
 
+    - name: Check file existence
+      id: check_npmrc
+      uses: andstor/file-existence-action@v2
+      with:
+        files: /home/runner/work/_temp/.npmrc
+
+#     Copy npmrc to working dir, because yarn won't pickup config from default path
+    - name: Copy .npmrc to working dir
+      working-directory: ${{ inputs.base-path }}
+      shell: bash
+      run: cp /home/runner/work/_temp/.npmrc .npmrc
+      if: steps.check_npmrc.outputs.files_exists == 'true'
+
     - name: Install dependencies
       working-directory: ${{ inputs.base-path }}
       shell: bash
       run: yarn install
+      env:
+        NODE_AUTH_TOKEN: ${{ inputs.registry-token }}

@@ -41,13 +41,9 @@ runs:
           !lib
           !*.js
           !*.d.ts
-          !package.json
-          !README.md
-          !LICENSE
           !.es*
           /*
           /**/*
-          node_modules
         ' | sed 's/ //g' > .npmignore
 
     - name: Install dependencies

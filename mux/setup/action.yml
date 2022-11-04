@@ -1,7 +1,7 @@
 name: Setup environment
 description: Setup environment per `env.BUILD_LANG`
 
-inputs: 
+inputs:
   base-path:
     description: Base path to run install on
     required: false
@@ -11,6 +11,9 @@ inputs:
     required: false
   registry:
     description: Registry
+    required: false
+  registry-token:
+    description: Token for logging into registry
     required: false
 
 
@@ -23,6 +26,7 @@ runs:
         base-path: ${{ inputs.base-path }}
         cache: ${{ inputs.cache != '' && inputs.cache || 'yarn' }}
         registry: ${{ inputs.registry }}
+        registry-token: ${{ inputs.registry-token }}
       if: env.BUILD_LANG == 'node'
 
     - name: Setup python
