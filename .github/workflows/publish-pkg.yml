@@ -11,6 +11,10 @@ on:
         description: Base language dependency manager to cache (`none`, [...package manager name...])
         type: string
         required: false
+      base-registry:
+        description: URL of registry for base language
+        type: string
+        required: false
       package-language:
         description: Package Language (language of package to be export) (Defaults to base language)
         type: string
@@ -45,6 +49,12 @@ on:
       PACKAGE_REGISTRY_TOKEN:
         description: Token for logging into registry to export to
         required: false
+      PACKAGE_DEPENDENCIES_REGISTRY_TOKEN:
+        description: Token for logging into registry to export to
+        required: false
+      PACKAGE_TARGET_REGISTRY_TOKEN:
+        description: Token for logging into registry to export to
+        required: false
 
 env:
   BUILD_LANG: ${{ inputs.base-language }}
@@ -62,6 +72,7 @@ jobs:
         uses: pukenicorn/gh-workflows/mux/setup@main
         with:
           cache: ${{ inputs.base-language-cache }}
+          registry: ${{ inputs.package-language != inputs.base-language && inputs.package-registry || inputs.base-registry }}
 
       - name: Run post-setup command
         uses: pukenicorn/gh-workflows/mux/run-command@main
@@ -77,9 +88,10 @@ jobs:
         env:
           BUILD_LANG: ${{ inputs.package-language != '' && inputs.package-language || inputs.base-language }}
         with:
+          base-path: ${{ inputs.package-path }}
           cache: ${{ inputs.package-language-cache }}
           registry: ${{ inputs.package-registry }}
-        if: inputs.package-language != '' && inputs.package-language != inputs.base-language
+        if: inputs.package-language != '' && (inputs.package-language != inputs.base-language || inputs.package-registry != inputs.base-registry)
 
       - name: Publish package
         uses: pukenicorn/gh-workflows/mux/publish@main
@@ -90,4 +102,4 @@ jobs:
           name: ${{ inputs.package-name }}
           version: ${{ inputs.package-version }}
           registry: ${{ inputs.package-registry }}
-          registry-token: ${{ secrets.PACKAGE_REGISTRY_TOKEN != '' && secrets.PACKAGE_REGISTRY_TOKEN || github.token }}
+          registry-token: ${{ secrets.PACKAGE_DEPENDENCIES_REGISTRY_TOKEN || secrets.PACKAGE_REGISTRY_TOKEN || github.token }}
