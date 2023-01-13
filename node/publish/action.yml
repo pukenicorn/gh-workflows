@@ -6,14 +6,6 @@ inputs:
     description: Base path to run install on
     required: false
     default: .
-  name:
-    description: Name of exported package
-    required: false
-    default: ${{ github.repository }}
-#  registry:
-#    description: URL of registry to export to
-#    required: false
-#    default: registry.npmjs.org
   registry-token:
     description: Token for logging into registry to export to
     required: true

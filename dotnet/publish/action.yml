@@ -28,17 +28,25 @@ runs:
     - name: Add source for push
       working-directory: ${{ inputs.base-path }}
       shell: bash
-      run: |
-        dotnet add source --name xoxo "${{ inputs.registry }}" --username USERNAME --store-password-in-clear-text --password ${{ inputs.registry-token }}
+      run: |-
+        dotnet nuget add source \
+          --name xoxo "${{ inputs.registry }}" \
+          --username USERNAME \
+          --store-password-in-clear-text \
+          --password ${{ inputs.registry-token }}
 
     - name: Build nuget package
       working-directory: ${{ inputs.base-path }}
       shell: bash
-      run: |
-        dotnet pack "${{ inputs.name }}.csproj" --configuration Release -p:PackageVersion=${{ inputs.registry-token }}
+      run: |-
+        dotnet pack "${{ inputs.name }}.csproj" \
+          --configuration Release \
+          -p:PackageVersion=${{ inputs.version }}
 
     - name: Push package to registry
       working-directory: ${{ inputs.base-path }}
       shell: bash
-      run: |
-        dotnet nuget push "bin/Release/${{ inputs.name }}.${{ inputs.version }}.nupkg" --api-key ${{ inputs.registry-token }} --source "xoxo"
+      run: |-
+        dotnet nuget push "bin/Release/${{ inputs.name }}.${{ inputs.version }}.nupkg" \
+          --api-key ${{ inputs.registry-token }} \
+          --source "xoxo"
