@@ -10,6 +10,10 @@ inputs:
     description: Dependency manager to cache
     required: false
     default: poetry
+  version:
+    description: Version of SDK
+    required: false
+    default: '3.10'
 
 
 runs:
@@ -22,7 +26,7 @@ runs:
     - name: Setup python
       uses: actions/setup-python@v4
       with:
-        python-version: '3.10'
+        python-version: ${{ inputs.version }}
         cache: ${{ inputs.cache != 'none' && inputs.cache || '' }}
 
     - name: Install dependencies

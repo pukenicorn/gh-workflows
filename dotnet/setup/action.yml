@@ -6,6 +6,10 @@ inputs:
     description: Base path to run install on
     required: false
     default: .
+  version:
+    description: Version of SDK
+    required: false
+    default: '7.0'
 
 
 runs:
@@ -14,7 +18,7 @@ runs:
     - name: Setup dotnet
       uses: actions/setup-dotnet@v3
       with:
-        dotnet-version: '7.0'
+        dotnet-version: ${{ inputs.version }}
 
     - name: Install dependencies
       working-directory: ${{ inputs.base-path }}

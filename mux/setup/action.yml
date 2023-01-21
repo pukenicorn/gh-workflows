@@ -15,6 +15,9 @@ inputs:
   registry-token:
     description: Token for logging into registry
     required: false
+  version:
+    description: Version of SDK
+    required: false
 
 
 runs:
@@ -24,6 +27,7 @@ runs:
       uses: pukenicorn/gh-workflows/node/setup@main
       with:
         base-path: ${{ inputs.base-path }}
+        version: ${{ inputs.version }}
         cache: ${{ inputs.cache != '' && inputs.cache || 'yarn' }}
         registry: ${{ inputs.registry }}
         registry-token: ${{ inputs.registry-token }}
@@ -33,6 +37,7 @@ runs:
       uses: pukenicorn/gh-workflows/python/setup@main
       with:
         base-path: ${{ inputs.base-path }}
+        version: ${{ inputs.version }}
         cache: ${{ inputs.cache != '' && inputs.cache || 'poetry' }}
       if: env.BUILD_LANG == 'python'
 
@@ -40,4 +45,5 @@ runs:
       uses: pukenicorn/gh-workflows/dotnet/setup@main
       with:
         base-path: ${{ inputs.base-path }}
+        version: ${{ inputs.version }}
       if: env.BUILD_LANG == 'dotnet'

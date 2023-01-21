@@ -7,6 +7,10 @@ on:
         description: Base language (language of codebase)
         type: string
         required: true
+      base-sdk-version:
+        description: Base related SDK version
+        type: string
+        required: false
       base-language-cache:
         description: Base language dependency manager to cache (`none`, [...package manager name...])
         type: string
@@ -19,8 +23,12 @@ on:
         description: Package Language (language of package to be export) (Defaults to base language)
         type: string
         required: false
+      package-sdk-version:
+        description: Package related SDK version
+        type: string
+        required: false
       package-language-cache:
-        description: Base language dependency manager to cache (`default`, [...package manager name...])
+        description: Package language dependency manager to cache (`default`, [...package manager name...])
         type: string
         required: false
       package-path:
@@ -73,6 +81,7 @@ jobs:
         with:
           cache: ${{ inputs.base-language-cache }}
           registry: ${{ inputs.package-language != inputs.base-language && inputs.package-registry || inputs.base-registry }}
+          version: ${{ inputs.base-sdk-version != '' && inputs.base-sdk-version || inputs.base-sdk-version }}
 
       - name: Run post-setup command
         uses: pukenicorn/gh-workflows/mux/run-command@main
@@ -91,6 +100,7 @@ jobs:
           base-path: ${{ inputs.package-path }}
           cache: ${{ inputs.package-language-cache }}
           registry: ${{ inputs.package-registry }}
+          version: ${{ inputs.package-sdk-version != '' && inputs.package-sdk-version || inputs.base-sdk-version }}
         if: inputs.package-language != '' && (inputs.package-language != inputs.base-language || inputs.package-registry != inputs.base-registry)
 
       - name: Publish package
