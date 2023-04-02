@@ -9,8 +9,6 @@ inputs:
   version:
     description: Version of SDK
     required: false
-    default: '7.0'
-
 
 runs:
   using: composite
@@ -18,7 +16,7 @@ runs:
     - name: Setup dotnet
       uses: actions/setup-dotnet@v3
       with:
-        dotnet-version: ${{ inputs.version }}
+        dotnet-version: ${{ inputs.version != '' && inputs.version || '7.0' }}
 
     - name: Install dependencies
       working-directory: ${{ inputs.base-path }}

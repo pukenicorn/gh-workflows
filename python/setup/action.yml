@@ -13,8 +13,6 @@ inputs:
   version:
     description: Version of SDK
     required: false
-    default: '3.10'
-
 
 runs:
   using: composite
@@ -26,7 +24,7 @@ runs:
     - name: Setup python
       uses: actions/setup-python@v4
       with:
-        python-version: ${{ inputs.version }}
+        python-version: ${{ inputs.version != '' && inputs.version || '3.10' }}
         cache: ${{ inputs.cache != 'none' && inputs.cache || '' }}
 
     - name: Install dependencies
