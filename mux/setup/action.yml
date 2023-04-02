@@ -47,3 +47,10 @@ runs:
         base-path: ${{ inputs.base-path }}
         version: ${{ inputs.version }}
       if: env.BUILD_LANG == 'dotnet'
+
+    - name: Setup dart
+      uses: pukenicorn/gh-workflows/dart/setup@main
+      with:
+        base-path: ${{ inputs.base-path }}
+        version: ${{ inputs.version }}
+      if: env.BUILD_LANG == 'dart'

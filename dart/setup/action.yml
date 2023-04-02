@@ -1,0 +1,19 @@
+name: Setup dart environment
+description: Setup dart environment
+
+inputs:
+  base-path:
+    description: Base path to run install on
+    required: false
+    default: .
+
+runs:
+  using: composite
+  steps:
+    - name: Setup dart
+      uses: dart-lang/setup-dart@v1
+
+    - name: Install dependencies
+      shell: bash
+      working-directory: ${{ inputs.base-path }}
+      run: dart pub get

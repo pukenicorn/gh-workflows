@@ -57,3 +57,13 @@ runs:
         registry-token: ${{ inputs.registry-token }}
         version: ${{ steps.normalize-version.outputs.normalized-version }}
       if: env.BUILD_LANG == 'dotnet'
+
+    - name: Publish dart
+      uses: pukenicorn/gh-workflows/dart/publish@main
+      with:
+        base-path: ${{ inputs.base-path }}/${{ inputs.name }}
+        name: ${{ inputs.name }}
+        registry: ${{ inputs.registry != '' && inputs.registry || 'https://api.nuget.org/v3/index.json' }}
+        registry-token: ${{ inputs.registry-token }}
+        version: ${{ steps.normalize-version.outputs.normalized-version }}
+      if: env.BUILD_LANG == 'dart'

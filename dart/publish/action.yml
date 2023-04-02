@@ -1,0 +1,43 @@
+name: Publish dart package
+description: Publish dart package
+
+inputs:
+  base-path:
+    description: Base path to run install on
+    required: false
+    default: .
+  name:
+    description: Name of exported package
+    required: false
+    default: ${{ github.repository }}
+  registry:
+    description: URL of registry to export to
+    required: false
+  registry-token:
+    description: Token for logging into registry to export to
+    required: true
+  version:
+    description: Version of package
+    required: true
+
+
+runs:
+  using: composite
+  steps:
+    - name: Build client
+      shell: bash
+      working-directory: ${{ inputs.base-path }}
+      run: dart pub run build_runner build --delete-conflicting-outputs
+
+    - name: Commit generated files
+      shell: bash
+      run: |-
+        git checkout -b "dart-client/${{ inputs.version }}"
+        git add . && git commit -m "Client Version: ${{ inputs.version }}"
+
+    - name: Push client branch and tags
+      shell: bash
+      run: |-
+        git tag -f client-${{ inputs.version }}
+        git tag -f client-latest
+        git push -f origin refs/tags/client-${{ inputs.version }} refs/tags/client-latest
