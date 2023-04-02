@@ -53,6 +53,11 @@ on:
         description: Version of package
         type: string
         required: true
+      generate-swagger:
+        description: Runs generate swagger spec if true
+        type: boolean
+        required: false
+        default: true
     secrets:
       PACKAGE_REGISTRY_TOKEN:
         description: Token for logging into registry to export to
@@ -73,6 +78,11 @@ jobs:
     name: Publish package
     runs-on: ubuntu-latest
     steps:
+      - name: Normalize `version`
+        id: normalize-version
+        shell: bash
+        run: echo normalized-version=$(sed -E 's/[^0-9.-]//g' <<< "${{ inputs.version }}") >> $GITHUB_OUTPUT
+
       - name: Checkout
         uses: actions/checkout@v3
 
@@ -87,10 +97,16 @@ jobs:
         uses: pukenicorn/gh-workflows/mux/run-command@main
         with:
           command: ${{ inputs.post-setup-command }}
-        env:
-          PACKAGE_NAME: ${{ inputs.package-name }}
-          PACKAGE_REPOSITORY: ${{ inputs.package-registry }}
         if: inputs.post-setup-command != ''
+
+      - name: Generate swagger
+        uses: pukenicorn/gh-workflows/mux/generate-swagger@main
+        with:
+          base-path: ${{ inputs.package-path }}
+          package-name: ${{ inputs.package-name }}
+          package-version: ${{ steps.normalize-version.outputs.normalized-version }}
+          package-repository: ${{ inputs.package-registry }}
+        if: inputs.generate-swagger
 
       - name: Setup for package
         uses: pukenicorn/gh-workflows/mux/setup@main
@@ -110,6 +126,6 @@ jobs:
         with:
           base-path: ${{ inputs.package-path }}
           name: ${{ inputs.package-name }}
-          version: ${{ inputs.package-version }}
+          version: ${{ steps.normalize-version.outputs.normalized-version }}
           registry: ${{ inputs.package-registry }}
           registry-token: ${{ secrets.PACKAGE_DEPENDENCIES_REGISTRY_TOKEN || secrets.PACKAGE_REGISTRY_TOKEN || github.token }}

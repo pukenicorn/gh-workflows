@@ -31,7 +31,7 @@ runs:
     - name: Publish node
       uses: pukenicorn/gh-workflows/node/publish@main
       with:
-        base-path: ${{ inputs.base-path}}
+        base-path: ${{ inputs.base-path }}
         registry-token: ${{ inputs.registry-token }}
         version: ${{ steps.normalize-version.outputs.normalized-version }}
       env:
@@ -42,7 +42,7 @@ runs:
     - name: Publish python
       uses: pukenicorn/gh-workflows/python/publish@main
       with:
-        base-path: ${{ inputs.base-path}}
+        base-path: ${{ inputs.base-path }}
         registry: ${{ inputs.registry != '' && inputs.registry || 'NOT IMPLEMENTED' }}
         registry-token: ${{ inputs.registry-token }}
         version: ${{ steps.normalize-version.outputs.normalized-version }}
@@ -51,7 +51,7 @@ runs:
     - name: Publish dotnet
       uses: pukenicorn/gh-workflows/dotnet/publish@main
       with:
-        base-path: ${{ inputs.base-path}}/${{ inputs.name }}
+        base-path: ${{ inputs.base-path }}/${{ inputs.name }}
         name: ${{ inputs.name }}
         registry: ${{ inputs.registry != '' && inputs.registry || 'https://api.nuget.org/v3/index.json' }}
         registry-token: ${{ inputs.registry-token }}

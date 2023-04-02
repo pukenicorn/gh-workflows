@@ -1,0 +1,80 @@
+name: Run command
+description: Run command per `env.BUILD_LANG`
+
+inputs:
+  base-path:
+    description: Base path to run command on
+    required: false
+    default: .
+  package-name:
+    description: Name of the published package
+    required: true
+  package-repository:
+    description: Repository of the published package (Only used for npm)
+    required: false
+  package-version:
+    description: Version of the published package
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - name: Generate client for node
+      shell: bash
+      working-directory: ${{ inputs.base-path }}
+      run: |-
+        echo '{ "supportsES6": true, "npmName": "${{ inputs.package-name }}", "npmVersion": "${{ inputs.package-version }}", "npmRepository": "${{ inputs.package-repository }}" }' > generator-config.json
+        docker run --rm \
+          --user $$(id -u):$$(id -g) \
+          -v "${PWD}:/local" \
+          openapitools/openapi-generator-cli generate \
+            -g typescript-axios \
+            -i /local/openapi.yml \
+            -o /local/client \
+            -c /local/generator-config.json
+      if: env.BUILD_LANG == 'node'
+
+    - name: Generate client for python
+      shell: bash
+      working-directory: ${{ inputs.base-path }}
+      run: |-
+        echo '{ "disallowAdditionalPropertiesIfNotPresent": false, "packageName": "${{ inputs.package-name }}", "packageVersion": "${{ inputs.package-version }}" }' > generator-config.json
+        docker run --rm \
+          --user $(id -u):$(id -g) \
+          -v "${PWD}:/local" \
+          openapitools/openapi-generator-cli generate \
+            -g python-nextgen \
+            -i /local/openapi.yml \
+            -o /local/client \
+            -c /local/generator-config.json
+
+      if: env.BUILD_LANG == 'python'
+
+    - name: Generate client for dotnet
+      shell: bash
+      working-directory: ${{ inputs.base-path }}
+      run: |-
+        echo '{ "targetFramework": "net6.0;net7.0", "netCoreProjectFile": true, "packageName": "${{ inputs.package-name }}", "packageVersion": "${{ inputs.package-version }}", "library": "httpclient", "sourceFolder": "/" }' > generator-config.json
+        docker run --rm \
+          --user $$(id -u):$$(id -g) \
+          -v "${PWD}:/local" \
+          openapitools/openapi-generator-cli generate \
+            -g csharp-netcore \
+            -i /local/openapi.yml \
+            -o /local/client \
+            -c /local/generator-config.json
+      if: env.BUILD_LANG == 'dotnet'
+
+    - name: Generate client for dart
+      shell: bash
+      working-directory: ${{ inputs.base-path }}
+      run: |-
+        echo '{ "disallowAdditionalPropertiesIfNotPresent": false, "pubName": "${{ inputs.package-name }}", "pubVersion": "${{ inputs.package-version }}" }' > generator-config.json
+        docker run --rm \
+          --user $(id -u):$(id -g) \
+          -v "${PWD}:/local" \
+          openapitools/openapi-generator-cli generate \
+            -g dart-dio \
+            -i /local/openapi.yml \
+            -o /local/client \
+            -c /local/generator-config.json
