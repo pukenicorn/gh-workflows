@@ -44,4 +44,7 @@ runs:
       run: |-
         git tag -f client-${{ inputs.version }}
         git tag -f client-latest
-        git push -f origin refs/tags/client-${{ inputs.version }} refs/tags/client-latest
+        git push -f origin dart-client/${{ inputs.version }} \
+        git push -f origin \
+          refs/tags/client-${{ inputs.version }} \
+          refs/tags/client-latest
