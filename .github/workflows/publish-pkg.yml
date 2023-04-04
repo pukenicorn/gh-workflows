@@ -81,7 +81,7 @@ jobs:
       - name: Normalize `version`
         id: normalize-version
         shell: bash
-        run: echo normalized-version=$(sed -E 's/[^0-9.-]//g' <<< "${{ inputs.version }}") >> $GITHUB_OUTPUT
+        run: echo normalized-version=$(sed -E 's/[^0-9.-]//g' <<< "${{ inputs.package-version }}") >> $GITHUB_OUTPUT
 
       - name: Checkout
         uses: actions/checkout@v3
