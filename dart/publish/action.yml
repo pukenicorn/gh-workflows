@@ -42,9 +42,9 @@ runs:
     - name: Push client branch and tags
       shell: bash
       run: |-
-        git tag -f client-${{ inputs.version }}
-        git tag -f client-latest
+        git tag -f dart-client-${{ inputs.version }}
+        git tag -f dart-client-latest
         git push -f origin dart-client/${{ inputs.version }}
         git push -f origin \
-          refs/tags/client-${{ inputs.version }} \
-          refs/tags/client-latest
+          refs/tags/dart-client-${{ inputs.version }} \
+          refs/tags/dart-client-latest
