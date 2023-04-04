@@ -36,7 +36,8 @@ runs:
       shell: bash
       run: |-
         git checkout -b "dart-client/${{ inputs.version }}"
-        git add . && git commit -m "Client Version: ${{ inputs.version }}"
+        git add -f -- ${{ inputs.base-path }}
+        git commit -m "Client Version: ${{ inputs.version }}"
 
     - name: Push client branch and tags
       shell: bash
