@@ -101,6 +101,8 @@ jobs:
 
       - name: Generate swagger
         uses: pukenicorn/gh-workflows/mux/generate-swagger@main
+        env:
+          BUILD_LANG: ${{ inputs.package-language != '' && inputs.package-language || inputs.base-language }}
         with:
           base-path: ${{ inputs.package-path }}
           package-name: ${{ inputs.package-name }}

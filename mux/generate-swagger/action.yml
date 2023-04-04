@@ -47,7 +47,6 @@ runs:
             -i /local/openapi.yml \
             -o /local/client \
             -c /local/generator-config.json
-
       if: env.BUILD_LANG == 'python'
 
     - name: Generate client for dotnet
