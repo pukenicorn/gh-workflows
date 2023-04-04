@@ -61,7 +61,7 @@ runs:
     - name: Publish dart
       uses: pukenicorn/gh-workflows/dart/publish@main
       with:
-        base-path: ${{ inputs.base-path }}/${{ inputs.name }}
+        base-path: ${{ inputs.base-path }}
         name: ${{ inputs.name }}
         registry: ${{ inputs.registry != '' && inputs.registry || 'https://api.nuget.org/v3/index.json' }}
         registry-token: ${{ inputs.registry-token }}

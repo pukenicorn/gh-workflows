@@ -113,8 +113,8 @@ jobs:
         env:
           BUILD_LANG: ${{ inputs.package-language != '' && inputs.package-language || inputs.base-language }}
         with:
-          base-path: ${{ inputs.package-path }}
-          cache: ${{ inputs.package-language-cache }}
+          base-path: ${{ inputs.package-path }}${{ inputs.generate-swagger && '/client' || '' }}
+          cache: ${{ (inputs.package-language != '' && inputs.package-language-cache != '') && inputs.package-language-cache || inputs.base-language-cache }}
           registry: ${{ inputs.package-registry }}
           version: ${{ inputs.package-sdk-version != '' && inputs.package-sdk-version || inputs.base-sdk-version }}
         if: inputs.package-language != '' && (inputs.package-language != inputs.base-language || inputs.package-registry != inputs.base-registry)
@@ -124,7 +124,7 @@ jobs:
         env:
           BUILD_LANG: ${{ inputs.package-language != '' && inputs.package-language || inputs.base-language }}
         with:
-          base-path: ${{ inputs.package-path }}
+          base-path: ${{ inputs.package-path }}${{ inputs.generate-swagger && '/client' || '' }}
           name: ${{ inputs.package-name }}
           version: ${{ steps.normalize-version.outputs.normalized-version }}
           registry: ${{ inputs.package-registry }}
