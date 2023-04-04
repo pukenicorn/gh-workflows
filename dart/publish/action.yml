@@ -29,6 +29,9 @@ runs:
       working-directory: ${{ inputs.base-path }}
       run: dart pub run build_runner build --delete-conflicting-outputs
 
+    - name: Setup Git Account
+      uses: pukenicorn/gh-workflows/misc/setup-git-account@main
+
     - name: Commit generated files
       shell: bash
       run: |-

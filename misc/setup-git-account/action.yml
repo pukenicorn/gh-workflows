@@ -1,0 +1,11 @@
+name: Setup git account
+description: Setup git account config
+
+runs:
+  using: composite
+  steps:
+    - name: Setup git account
+      shell: bash
+      run: |-
+        git config --global user.email "service@pukenicorn.com"
+        git config --global user.name "Pukenicorn Service Account"
