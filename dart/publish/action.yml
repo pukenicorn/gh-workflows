@@ -35,7 +35,6 @@ runs:
     - name: Commit generated files
       shell: bash
       run: |-
-        git checkout -b "dart-client/${{ inputs.version }}"
         git add -f -- ${{ inputs.base-path }}
         git commit -m "Client Version: ${{ inputs.version }}"
 
@@ -44,7 +43,6 @@ runs:
       run: |-
         git tag -f dart-client-${{ inputs.version }}
         git tag -f dart-client-latest
-        git push -f origin dart-client/${{ inputs.version }}
         git push -f origin \
           refs/tags/dart-client-${{ inputs.version }} \
           refs/tags/dart-client-latest
